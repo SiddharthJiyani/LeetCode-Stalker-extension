@@ -15,7 +15,7 @@ The **LeetCode Friends List Extension** is a Chrome extension that allows users 
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/leetcode-friends-list-extension.git
+   git clone https://github.com/SiddharthJiyani/Leetcode-friends-list-extention.git
    ```
 
 2. **Load the Extension**:
