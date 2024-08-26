@@ -71,8 +71,6 @@
       text-decoration: underline;
     }
     .remove-btn {
-      /* color: rgb(243, 48, 48);
-      font-size: 0.9em; */
       display: inline-block;
       background-color: transparent;
       border: none;
@@ -126,12 +124,39 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #e78c04;
     }
+    #changeUsername{
+      font-size: 0.4em;
+      padding: 5px;
+      color: white;
+      text-decoration: underline;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      background: none;
+      margin-right: -200px;
+    }
+    .username{
+      background-color: transparent;
+      color: white;
+    }
+    .username:hover{
+      background-color: transparent;
+    }
   </style>
 </head>
 <body>
   <h2>LeetCode Friends <img src="./icons/leetcode.svg" alt="LeetCode logo"></h2>
-  <input type="text" id="username" placeholder="Your LeetCode username">
-  <button id="saveUsername">Save Username</button>
+  <!-- Username input section -->
+  <div id="usernameContainer">
+    <input type="text" id="username" placeholder="Your LeetCode username">
+    <button id="saveUsername">Save Username</button>
+</div>
+
+<!-- Welcome message -->
+<p id="welcomeMessage" style="text-align: center; margin-bottom: -2px ;font-size: 2em; color: white;"></p>
+  <!-- change username btn -->
+  <button id="changeUsername" >Change Username</button>
   <br><br>
   <input type="text" id="friendUsername" placeholder="Friend's username">
   <button id="addFriend">Add Friend</button>

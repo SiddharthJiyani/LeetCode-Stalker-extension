@@ -23,6 +23,35 @@ document.getElementById('friendUsername').addEventListener('keydown', async (eve
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Retrieve the saved username from Chrome storage
+    chrome.storage.sync.get(['ownUsername'], (result) => {
+        const savedUsername = result.ownUsername;
+
+
+        // Check if a username is saved
+        if (savedUsername) {
+            // User is logged in; show a welcome message
+            document.getElementById('welcomeMessage').innerHTML = `Hello👋, <a href="https://leetcode.com/u/${savedUsername}/" target="_blank" class="username" style="font-weight: bold; background-color="transparent";>${savedUsername}</a> !`;
+            document.getElementById('usernameContainer').style.display = 'none'; // Hide the username input
+
+            // Add a change username button
+            const changeUsernameBtn = document.getElementById('changeUsername');
+            // changeUsernameBtn.innerText = 'Change Username';
+            changeUsernameBtn.addEventListener('click', () => {
+                document.getElementById('welcomeMessage').innerText = '';
+                document.getElementById('usernameContainer').style.display = 'block'; // Show the username input
+            });
+            document.getElementById('welcomeMessage').appendChild(changeUsernameBtn);
+        } else {
+            // No username saved; show the input for username
+            document.getElementById('welcomeMessage').innerText = '';
+            document.getElementById('usernameContainer').style.display = 'block'; // Show the username input
+        }
+    });
+});
+
+
 // Enter key functionality for search
 document.getElementById('searchFriends').addEventListener('keydown', async (event) => {
     if (event.key === 'Enter') {
