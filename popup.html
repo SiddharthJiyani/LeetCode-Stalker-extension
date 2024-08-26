@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeetCode Friends</title>
   <style>
+    /* Existing styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -13,7 +14,6 @@
       margin: 0;
       width: 300px;
       height: auto;
-      /* border: 1px solid #ccc; */
       margin: 20px auto;
     }
     h2 {
@@ -66,9 +66,6 @@
       cursor: pointer;
       font-size: 0.9em;
     }
-    .friendsList{
-        padding-right: 5px;
-    }
     ul {
       list-style-type: none;
       padding: 0;
@@ -76,6 +73,10 @@
     }
     #addFriend{
         margin-bottom: 10px;
+    }
+    #showMore {
+      display: none;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -86,7 +87,10 @@
   <br><br>
   <input type="text" id="friendUsername" placeholder="Friend's username">
   <button id="addFriend">Add Friend</button>
+  <input type="text" id="searchFriends" placeholder="Search Friends">
   <ul id="friendsList"></ul>
+  <p style="text-align: center; font-size: 0.8em; color: #777;">Made with ❤️ by <a href="https://www.linkedin.com/in/siddharth-jiyani-7584a1266/" target="_blank" style="text-decoration: none; color: #0073e6; font-weight: bold; border-radius: 5px; background-color: #f4f4f4; transition: background-color 0.3s ease;">Siddharth</a></p>
+
   <script src="popup.js"></script>
 </body>
 </html>
