@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode Friends</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      padding: 15px;
+      margin: 0;
+      width: 300px;
+      height: auto;
+      /* border: 1px solid #ccc; */
+      margin: 20px auto;
+    }
+    h2 {
+      color: #0073e6;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    .friend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .friend-item a {
+      color: #0073e6;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .friend-item a:hover {
+      text-decoration: underline;
+    }
+    .remove-btn {
+      color: red;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .friendsList{
+        padding-right: 5px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    #addFriend{
+        margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Manage Friends</h2>
+  <input type="text" id="username" placeholder="Your LeetCode username">
+  <button id="saveUsername">Save Username</button>
+  <br><br>
+  <input type="text" id="friendUsername" placeholder="Friend's username">
+  <button id="addFriend">Add Friend</button>
+  <ul id="friendsList"></ul>
+  <script src="popup.js"></script>
+</body>
+</html>
