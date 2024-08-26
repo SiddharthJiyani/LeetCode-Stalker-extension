@@ -57,4 +57,4 @@ Feel free to submit issues and pull requests if you have improvements or fixes. 
 
 ## Contact
 
-For questions or support, please open an issue in the repository or contact [your-email@example.com](mailto:sidjiyani2003@example.com).
+For questions or support, please open an issue in the repository or contact [sidjiyani2003@example.com](mailto:sidjiyani2003@example.com).
