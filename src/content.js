@@ -81,6 +81,6 @@ function isOwnProfile() {
 
 isOwnProfile().then(isOwn => {
     if (isOwn) {
-        injectFriendsList();
+        setTimeout(injectFriendsList, 1000);
     }
 });
