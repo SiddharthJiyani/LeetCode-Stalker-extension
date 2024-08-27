@@ -107,7 +107,7 @@
       }
       /* Scrollbar styling */
       ::-webkit-scrollbar {
-        width: 0px;
+        width: 3px;
         height: 0px;
       }
 
@@ -165,48 +165,86 @@
         /* height: calc(100% - 20px); */
         width: 900px;
       }
+      .tabs {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #444;
+      }
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        color: #ffa116;
+        text-align: center;
+        transition: background-color 0.3s ease;
+      }
+      .tab.active {
+        border-bottom: 2px solid #ffa116;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
     </style>
   </head>
-  <body>
+  <div>
     <h2>
       LeetCode Friends <img src="./icons/leetcode.svg" alt="LeetCode logo" />
     </h2>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="friendsTab">Friends</div>
+      <div class="tab" data-tab="standingsTab">Contest Standings</div>
+    </div>
+    
+    <!-- Friends Tab Content -->
+    <div id="friendsTab" class="tab-content active">
     <!-- Username input section -->
-    <div id="usernameContainer">
-      <input type="text" id="username" placeholder="Your LeetCode username" />
-      <button id="saveUsername">Save Username</button>
+      <div id="usernameContainer">
+        <input type="text" id="username" placeholder="Your LeetCode username" />
+        <button id="saveUsername">Save Username</button>
+      </div>
+
+      <!-- Welcome message -->
+      <p
+        id="welcomeMessage"
+        style="
+          text-align: center;
+          margin-bottom: -2px;
+          font-size: 2em;
+          color: white;
+        "></p>
+      <!-- change username btn -->
+      <button id="changeUsername">Change Username</button>
+      <br /><br />
+
+      <!-- Add Friend Section -->
+      <input type="text" id="friendUsername" placeholder="Friend's username" />
+      <button id="addFriend">Add Friend</button>
+
+      <!-- Search Btn -->
+      <div class="search">
+        <input type="text" id="searchFriends" placeholder="Search Friends" />
+        <button id="searchFriend" class="searchBtn">
+          <img
+            src="./icons/search.png"
+            alt="search"
+            style="width: 30px; margin-top: -7px; margin-right: -15px" />
+        </button>
+      </div>
+
+      <!-- Friends List -->
+      <ul id="friendsList"></ul>
     </div>
 
-    <!-- Welcome message -->
-    <p
-      id="welcomeMessage"
-      style="
-        text-align: center;
-        margin-bottom: -2px;
-        font-size: 2em;
-        color: white;
-      "></p>
-    <!-- change username btn -->
-    <button id="changeUsername">Change Username</button>
-    <br /><br />
-
-    <!-- Add Friend Section -->
-    <input type="text" id="friendUsername" placeholder="Friend's username" />
-    <button id="addFriend">Add Friend</button>
-
-    <!-- Search Btn -->
-    <div class="search">
-      <input type="text" id="searchFriends" placeholder="Search Friends" />
-      <button id="searchFriend" class="searchBtn">
-        <img
-          src="./icons/search.png"
-          alt="search"
-          style="width: 30px; margin-top: -7px; margin-right: -15px" />
-      </button>
+      <!-- Contest Standings Tab Content -->
+    <div id="standingsTab" class="tab-content">
+      Here you can see the standings of your friends in the ongoing contest.
     </div>
 
-    <!-- Friends List -->
-    <ul id="friendsList"></ul>
+
     <p
       style="
         text-align: center;

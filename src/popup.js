@@ -3,6 +3,17 @@ const LC_API = 'https://alfa-leetcode-api.onrender.com/'
 // https://github.com/alfaarghya/alfa-leetcode-api  -- for the API
 // https://github.com/Algolisted-Org/LC-Live-Friends-Rating -- for Live contest rating
 
+// Initialize the tabs
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+
+        this.classList.add('active');
+        document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+    });
+});
+
 document.getElementById('saveUsername').addEventListener('click', () => {
     const username = document.getElementById('username').value;
     if (username) {
