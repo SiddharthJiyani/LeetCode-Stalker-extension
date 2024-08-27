@@ -1,3 +1,8 @@
+
+const LC_API = 'https://alfa-leetcode-api.onrender.com/'
+// https://github.com/alfaarghya/alfa-leetcode-api  -- for the API
+// https://github.com/Algolisted-Org/LC-Live-Friends-Rating -- for Live contest rating
+
 document.getElementById('saveUsername').addEventListener('click', () => {
     const username = document.getElementById('username').value;
     if (username) {
