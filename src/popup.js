@@ -25,7 +25,7 @@ document.querySelectorAll(".tab").forEach((tab) => {
 async function getSolvedProblems(username) {
   try {
     // First try fetching from the primary API
-    const response = await fetch(`${LC_API}${username}/solved`);
+    const response = await fetch(`${LC_API}${username}/solved`); 
     if (response.ok) {
       return await response.json();
     } else {
