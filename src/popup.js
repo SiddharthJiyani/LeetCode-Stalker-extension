@@ -3,6 +3,7 @@ const backup_API = "https://leetcode-stats-api.herokuapp.com/";
 // https://github.com/alfaarghya/alfa-leetcode-api  -- for the API
 // https://github.com/Algolisted-Org/LC-Live-Friends-Rating -- for Live contest rating
 
+
 // Initialize the tabs
 document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", function () {
@@ -46,7 +47,6 @@ async function getSolvedProblems(username) {
   }
 }
 
-
 // to get rating of user
 async function getRating(username) {
   try {
@@ -73,16 +73,28 @@ async function getRating(username) {
   }
 }
 
+// Fetch both solved problems and rating in parallel
+async function fetchFriendData(friend) {
+  const solvedDataPromise = getSolvedProblems(friend);
+  const ratingDataPromise = getRating(friend);
+  try {
+    const [solvedData, ratings] = await Promise.all([solvedDataPromise, ratingDataPromise]);
+    return { solvedData, ratings };
+  } catch (error) {
+    console.error(`Failed to fetch data for ${friend}:`, error);
+    return null;
+  }
+}
 
-// To get number of problems solved from api
-function createSolvedProblemsTable(solvedData,ratings) {
+// To get number of problems solved from API and create table
+function createSolvedProblemsTable(solvedData, ratings) {
   const table = document.createElement("table");
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
   table.style.marginTop = "10px";
   table.style.color = "#ffa116";
 
-  const headers = ["Total", "Easy", "Medium", "Hard","Rating"];
+  const headers = ["Total", "Easy", "Medium", "Hard", "Rating"];
   
   // Define the colors for each header
   const colors = ["white", "#1cbaba", "#f8b302", "#f63737","white"];
@@ -107,20 +119,19 @@ function createSolvedProblemsTable(solvedData,ratings) {
   const trBody = document.createElement("tr");
 
   const solvedNumbers = [
-    solvedData.solvedProblem, // ! handle here if backup api is used then we use solvedData.totalSolved
+    solvedData.easySolved +solvedData.mediumSolved+solvedData.hardSolved , // !handle here if backup API is used then use solvedData.totalSolved
     solvedData.easySolved,
     solvedData.mediumSolved,
     solvedData.hardSolved,
-		Math.round(ratings.contestRating)
+    Math.round(ratings.contestRating)
   ];
-
 
   solvedNumbers.forEach((solved, index) => {
     const td = document.createElement("td");
     td.textContent = solved;
     td.style.textAlign = "center";
     td.style.paddingTop = "5px";
-    td.style.color = colors[index]; // Apply the corresponding color to the data cell
+    td.style.color = colors[index];
     trBody.appendChild(td);
   });
 
@@ -129,8 +140,6 @@ function createSolvedProblemsTable(solvedData,ratings) {
 
   return table;
 }
-
-
 
 document.getElementById("saveUsername").addEventListener("click", () => {
   const username = document.getElementById("username").value;
@@ -154,7 +163,7 @@ document
   .getElementById("friendUsername")
   .addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
-      event.preventDefault(); // Prevent the default action (form submission)
+      event.preventDefault();
       addFriend();
     }
   });
@@ -169,35 +178,43 @@ document.addEventListener("DOMContentLoaded", () => {
       // User is logged in; show a welcome message
       document.getElementById(
         "welcomeMessage"
-      ).innerHTML = `Hello👋, <a href="https://leetcode.com/u/${savedUsername}/" target="_blank" class="username" style="font-weight: bold; background-color="transparent";>${savedUsername}</a> !`;
-      document.getElementById("usernameContainer").style.display = "none"; // Hide the username input
+      ).innerHTML = `Hello👋, <a href="https://leetcode.com/u/${savedUsername}/" target="_blank" class="username" style="font-weight: bold;">${savedUsername}</a> !`;
+      document.getElementById("usernameContainer").style.display = "none";
 
       // Add a change username button
       const changeUsernameBtn = document.getElementById("changeUsername");
-      // changeUsernameBtn.innerText = 'Change Username';
       changeUsernameBtn.addEventListener("click", () => {
         document.getElementById("welcomeMessage").innerText = "";
-        document.getElementById("usernameContainer").style.display = "block"; // Show the username input
+        document.getElementById("usernameContainer").style.display = "block";
       });
       document.getElementById("welcomeMessage").appendChild(changeUsernameBtn);
     } else {
       // No username saved; show the input for username
       document.getElementById("welcomeMessage").innerText = "";
-      document.getElementById("usernameContainer").style.display = "block"; // Show the username input
+      document.getElementById("usernameContainer").style.display = "block";
     }
   });
 });
 
-// Enter key functionality for search
+// Debounce function to limit the frequency of search calls
+function debounce(func, delay) {
+  let debounceTimer;
+  return function () {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(this, arguments), delay);
+  };
+}
+
+// Enter key functionality for search with debounce
 document
   .getElementById("searchFriends")
-  .addEventListener("keydown", async (event) => {
+  .addEventListener("keydown", debounce((event) => {
     if (event.key === "Enter") {
-      event.preventDefault(); // Prevent the default action (form submission)
+      event.preventDefault();
       const searchTerm = document.getElementById("searchFriends").value;
       updateFriendsList(searchTerm);
     }
-  });
+  }, 300));
 
 async function addFriend() {
   const friendUsername = document.getElementById("friendUsername").value;
@@ -258,54 +275,51 @@ function updateFriendsList(searchTerm = "") {
       );
     }
 
-    for (const friend of friends) {
-      const li = document.createElement("li");
-      li.className = "friend-item";
+    const fetchPromises = friends.map(fetchFriendData);
+    const friendsData = await Promise.all(fetchPromises);
 
-      const a = document.createElement("a");
-      a.href = `https://leetcode.com/${friend}/`;
-      a.textContent = friend.substring(0,10) + "...";
-      a.target = "_blank";
-			a.style.marginRight = "10px";
+    friendsData.forEach((data, index) => {
+      if (data) {
+        const friend = friends[index];
+        const li = document.createElement("li");
+        li.className = "friend-item";
 
-      const removeBtn = document.createElement("span");
-      removeBtn.className = "remove-btn";
-      removeBtn.style.backgroundImage = 'url("./icons/delete.png")';
-      removeBtn.style.backgroundSize = "16px 16px";
-      removeBtn.style.backgroundRepeat = "no-repeat";
-      removeBtn.style.width = "20px";
-      removeBtn.style.height = "20px";
-			removeBtn.style.paddingLeft = "5px";
-      removeBtn.style.cursor = "pointer";
-      removeBtn.onclick = () => removeFriend(friend);
+        const a = document.createElement("a");
+        a.href = `https://leetcode.com/${friend}/`;
+        a.textContent = friend.substring(0, 10) + "...";
+        a.target = "_blank";
+        a.style.marginRight = "10px";
 
-      const solvedData = await getSolvedProblems(friend);
-			const ratings = await getRating(friend);
-      const table = solvedData
-        ? createSolvedProblemsTable(solvedData,ratings)
-        : document.createTextNode("Could not fetch data.");
+        const removeBtn = document.createElement("span");
+        removeBtn.className = "remove-btn";
+        removeBtn.style.backgroundImage = 'url("./icons/delete.png")';
+        removeBtn.style.backgroundSize = "16px 16px";
+        removeBtn.style.backgroundRepeat = "no-repeat";
+        removeBtn.style.width = "20px";
+        removeBtn.style.height = "20px";
+        removeBtn.style.paddingLeft = "5px";
+        removeBtn.style.cursor = "pointer";
+        removeBtn.onclick = () => removeFriend(friend);
 
-      li.appendChild(a); // Append the link with the friend's name
-      li.appendChild(table); // Append the table with solved problem stats
-      li.appendChild(removeBtn); // Append the remove button
+        const table = data.solvedData
+          ? createSolvedProblemsTable(data.solvedData, data.ratings)
+          : document.createTextNode("Could not fetch data.");
 
-      friendsList.appendChild(li); // Append the entire list item to the friends list
-    }
+        li.appendChild(a); // Append the link with the friend's name
+        li.appendChild(table); // Append the table with solved problem stats
+        li.appendChild(removeBtn); // Append the remove button
+
+        friendsList.appendChild(li); // Append the entire list item to the friends list
+      }
+    });
 
     // Hide the loading spinner once all data is fetched
     hideLoadingSpinner();
   });
 }
 
-
+// Initialize friends list on page load
 document.addEventListener('DOMContentLoaded', () => {
-	hideLoadingSpinner(); // Make sure the spinner is hidden on page load.
-	updateFriendsList();
+  hideLoadingSpinner(); // Make sure the spinner is hidden on page load.
+  updateFriendsList();
 });
-
-
-document.getElementById("searchFriend").addEventListener("click", () => {
-  const searchTerm = document.getElementById("searchFriends").value;
-  updateFriendsList(searchTerm);
-});
-
