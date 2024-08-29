@@ -1,7 +1,9 @@
-const LC_API = "https://alfa-leetcode-api.onrender.com/";
-const backup_API = "https://leetcode-stats-api.herokuapp.com/";
+// const LC_API = "https://alfa-leetcode-api.onrender.com/";
+// const backup_API = "https://leetcode-stats-api.herokuapp.com/";
 // https://github.com/alfaarghya/alfa-leetcode-api  -- for the API
 // https://github.com/Algolisted-Org/LC-Live-Friends-Rating -- for Live contest rating
+
+const LC_API = 'https://leetcode.com/graphql'; 
 
 
 // Initialize the tabs
@@ -23,55 +25,84 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
 // to get solved problems
 async function getSolvedProblems(username) {
-  try {
-    // First try fetching from the primary API
-    const response = await fetch(`${LC_API}${username}/solved`); 
-    if (response.ok) {
-      return await response.json();
-    } else {
-      throw new Error("Primary API failed.");
-    }
-  } catch (error) {
-    console.error("Primary API failed, trying backup API:", error);
-    try {
-      // If the primary API fails, fetch from the backup API
-      const backupResponse = await fetch(`${backup_API}${username}/`);
-      if (!backupResponse.ok) {
-        throw new Error("Both APIs failed.");
+  const query = `
+    query {
+      matchedUser(username: "${username}") {
+        submitStats {
+          acSubmissionNum {
+            difficulty
+            count
+          }
+        }
       }
-      return await backupResponse.json();
-    } catch (backupError) {
-      console.error("Backup API failed as well:", backupError);
+    }
+  `;
+
+  try {
+    const response = await fetch(LC_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('Error fetching solved problems:', data.errors);
       return null;
     }
+
+    const submissionData = data.data.matchedUser.submitStats.acSubmissionNum;
+    const solvedData = {
+      easySolved: submissionData.find((item) => item.difficulty === 'Easy').count,
+      mediumSolved: submissionData.find((item) => item.difficulty === 'Medium').count,
+      hardSolved: submissionData.find((item) => item.difficulty === 'Hard').count,
+    };
+
+    return solvedData;
+  } catch (error) {
+    console.error('Failed to fetch solved problems:', error);
+    return null;
   }
 }
 
+
 // to get rating of user
 async function getRating(username) {
-  try {
-    // First try fetching from the primary API
-    const response = await fetch(`${LC_API}${username}/contest`);
-    if (response.ok) {
-      return await response.json();
-    } else {
-      throw new Error("Primary API failed.");
-    }
-  } catch (error) {
-    console.error("Primary API failed, trying backup API:", error);
-    try {
-      // If the primary API fails, fetch from the backup API
-      const backupResponse = await fetch(`${backup_API}${username}/`);
-      if (!backupResponse.ok) {
-        throw new Error("Both APIs failed.");
+  const query = `
+    query {
+      userContestRanking(username: "${username}") {
+        rating
       }
-      return await backupResponse.json();
-    } catch (backupError) {
-      console.error("Backup API failed as well:", backupError);
+    }
+  `;
+
+  try {
+    const response = await fetch(LC_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('Error fetching contest rating:', data.errors);
       return null;
     }
+
+    const ratingData = data.data.userContestRanking?.rating || null;
+    return { contestRating: ratingData };
+  } catch (error) {
+    console.error('Failed to fetch contest rating:', error);
+    return null;
   }
 }
+
 
 // Fetch both solved problems and rating in parallel
 async function fetchFriendData(friend) {
@@ -85,6 +116,7 @@ async function fetchFriendData(friend) {
     return null;
   }
 }
+
 
 // To get number of problems solved from API and create table
 function createSolvedProblemsTable(solvedData, ratings) {
