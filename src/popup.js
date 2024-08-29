@@ -119,6 +119,7 @@ async function fetchFriendData(friend) {
 
 
 // To get number of problems solved from API and create table
+// To get number of problems solved from API and create table
 function createSolvedProblemsTable(solvedData, ratings) {
   const table = document.createElement("table");
   table.style.width = "100%";
@@ -151,7 +152,7 @@ function createSolvedProblemsTable(solvedData, ratings) {
   const trBody = document.createElement("tr");
 
   const solvedNumbers = [
-    solvedData.easySolved +solvedData.mediumSolved+solvedData.hardSolved , // !handle here if backup API is used then use solvedData.totalSolved
+    solvedData.easySolved + solvedData.mediumSolved + solvedData.hardSolved, // !handle here if backup API is used then use solvedData.totalSolved
     solvedData.easySolved,
     solvedData.mediumSolved,
     solvedData.hardSolved,
@@ -167,11 +168,24 @@ function createSolvedProblemsTable(solvedData, ratings) {
     trBody.appendChild(td);
   });
 
+  // Change color of rating text if it is greater than 1860
+  const ratingTd = trBody.lastChild; // Get the last td element which contains the rating
+  const ratingValue = Math.round(ratings.contestRating);
+  if (ratingValue > 1860) {
+    ratingTd.style.color = "transparent";
+    ratingTd.style.background = "linear-gradient(to right, #82d9bc, #0d9a41)"; 
+    ratingTd.style.webkitBackgroundClip = "text";
+    ratingTd.style.backgroundClip = "text"; 
+    ratingTd.style.fontWeight = "bold"; 
+  }
+
+
   tbody.appendChild(trBody);
   table.appendChild(tbody);
 
   return table;
 }
+
 
 document.getElementById("saveUsername").addEventListener("click", () => {
   const username = document.getElementById("username").value;
