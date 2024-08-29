@@ -332,9 +332,14 @@ function updateFriendsList(searchTerm = "") {
 
         const a = document.createElement("a");
         a.href = `https://leetcode.com/${friend}/`;
-        a.textContent = friend.substring(0, 10) + "...";
+        a.textContent = friend
         a.target = "_blank";
         a.style.marginRight = "10px";
+        a.style.width = "100px";
+        a.style.display = "inline-block";
+        a.style.overflow = "hidden";
+        a.style.textOverflow = "ellipsis";
+
 
         const removeBtn = document.createElement("span");
         removeBtn.className = "remove-btn";
