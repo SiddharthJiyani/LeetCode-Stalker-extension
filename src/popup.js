@@ -1,8 +1,3 @@
-// const LC_API = "https://alfa-leetcode-api.onrender.com/";
-// const backup_API = "https://leetcode-stats-api.herokuapp.com/";
-// https://github.com/alfaarghya/alfa-leetcode-api  -- for the API
-// https://github.com/Algolisted-Org/LC-Live-Friends-Rating -- for Live contest rating
-
 const LC_API = 'https://leetcode.com/graphql'; 
 
 
@@ -119,7 +114,6 @@ async function fetchFriendData(friend) {
 
 
 // To get number of problems solved from API and create table
-// To get number of problems solved from API and create table
 function createSolvedProblemsTable(solvedData, ratings) {
   const table = document.createElement("table");
   table.style.width = "100%";
@@ -152,7 +146,7 @@ function createSolvedProblemsTable(solvedData, ratings) {
   const trBody = document.createElement("tr");
 
   const solvedNumbers = [
-    solvedData.easySolved + solvedData.mediumSolved + solvedData.hardSolved, // !handle here if backup API is used then use solvedData.totalSolved
+    solvedData.easySolved + solvedData.mediumSolved + solvedData.hardSolved, 
     solvedData.easySolved,
     solvedData.mediumSolved,
     solvedData.hardSolved,
@@ -168,8 +162,7 @@ function createSolvedProblemsTable(solvedData, ratings) {
     trBody.appendChild(td);
   });
 
-  // Change color of rating text if it is greater than 1860
-  const ratingTd = trBody.lastChild; // Get the last td element which contains the rating
+  const ratingTd = trBody.lastChild;
   const ratingValue = Math.round(ratings.contestRating);
   if (ratingValue > 1860) {
     ratingTd.style.color = "transparent";
@@ -303,6 +296,9 @@ function hideLoadingSpinner() {
   document.getElementById("loadingSpinner").style.display = "none";
 }
 
+//https://leetcard.jacoblin.cool/${friend}?theme=dark&font=Fira%20Code&ext=contest
+
+
 function updateFriendsList(searchTerm = "") {
   const friendsList = document.getElementById("friendsList");
   friendsList.innerHTML = ""; // Clear the existing list
@@ -329,17 +325,52 @@ function updateFriendsList(searchTerm = "") {
         const friend = friends[index];
         const li = document.createElement("li");
         li.className = "friend-item";
+        li.style.position = "relative"; // Ensure the list item is positioned relative
 
         const a = document.createElement("a");
         a.href = `https://leetcode.com/${friend}/`;
-        a.textContent = friend
+        a.textContent = friend;
         a.target = "_blank";
         a.style.marginRight = "10px";
         a.style.width = "100px";
         a.style.display = "inline-block";
         a.style.overflow = "hidden";
         a.style.textOverflow = "ellipsis";
+        a.style.width = "150px";
+        a.style.height = "30px"; 
+        a.style.lineHeight = "30px";
+        a.style.padding = "0 5px"; 
 
+        // Hover modal
+        const hoverModal = document.createElement('div');
+        hoverModal.style.position = 'absolute';
+        hoverModal.style.left = '0';
+        hoverModal.style.zIndex = '10';
+        hoverModal.style.display = 'none';
+        hoverModal.style.backgroundColor = 'transparent';
+        hoverModal.style.padding = '50px';
+        hoverModal.style.width = '400px';
+        // translate up
+        hoverModal.style.transform = 'translateY(-50px)';
+
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://leetcard.jacoblin.cool/${friend}?width=500&height=250&animation=false&theme=dark&font=Noto%20Sans&ext=contest`;
+        iframe.width = '400px';
+        iframe.height = '250px';
+        iframe.style.border = 'none';
+        iframe.style.transform = 'scale(0.9)';
+        hoverModal.appendChild(iframe);
+
+        a.addEventListener('mouseover', () => {
+          hoverModal.style.display = 'block';
+        });
+
+        a.addEventListener('mouseout', () => {
+          hoverModal.style.display = 'none';
+        });
+
+        li.appendChild(a); // Append the link with the friend's name
+        li.appendChild(hoverModal); // Append the hover modal
 
         const removeBtn = document.createElement("span");
         removeBtn.className = "remove-btn";
