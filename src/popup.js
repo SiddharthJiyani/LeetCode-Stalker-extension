@@ -53,6 +53,7 @@ async function getRating(username) {
     query {
       userContestRanking(username: "${username}") {
         rating
+        topPercentage
       }
     }
   `;
@@ -74,7 +75,8 @@ async function getRating(username) {
     }
 
     const ratingData = data.data.userContestRanking?.rating || null;
-    return { contestRating: ratingData };
+    const topPercentage = data.data.userContestRanking?.topPercentage || null;
+    return { contestRating: ratingData, topPercentage: topPercentage };
   } catch (error) {
     console.error('Failed to fetch contest rating:', error);
     return null;
@@ -146,13 +148,21 @@ function createSolvedProblemsTable(solvedData, ratings) {
   });
 
   const ratingTd = trBody.lastChild;
-  const ratingValue = Math.round(ratings.contestRating);
-  if (ratingValue > 1860) {
+  const topPercentage = ratings.topPercentage;
+  if (topPercentage <= 5) {
     ratingTd.style.color = "transparent";
     ratingTd.style.background = "linear-gradient(to right, #82d9bc, #0d9a41)"; 
     ratingTd.style.webkitBackgroundClip = "text";
     ratingTd.style.backgroundClip = "text"; 
     ratingTd.style.fontWeight = "bold"; 
+  }
+
+  if(topPercentage <= 1){
+    ratingTd.style.color = "transparent";
+    ratingTd.style.background = "linear-gradient(to right,#a6c0ed , #1d77dc)"; 
+    ratingTd.style.webkitBackgroundClip = "text";
+    ratingTd.style.backgroundClip = "text"; 
+    ratingTd.style.fontWeight = "bold";
   }
 
 
@@ -279,8 +289,6 @@ function hideLoadingSpinner() {
   document.getElementById("loadingSpinner").style.display = "none";
 }
 
-//https://leetcard.jacoblin.cool/${friend}?theme=dark&font=Fira%20Code&ext=contest
-
 
 function updateFriendsList(searchTerm = "") {
   const friendsList = document.getElementById("friendsList");
@@ -308,7 +316,7 @@ function updateFriendsList(searchTerm = "") {
         const friend = friends[index];
         const li = document.createElement("li");
         li.className = "friend-item";
-        li.style.position = "relative"; // Ensure the list item is positioned relative
+        li.style.position = "relative";
 
         const a = document.createElement("a");
         a.href = `https://leetcode.com/${friend}/`;
@@ -329,31 +337,43 @@ function updateFriendsList(searchTerm = "") {
         hoverModal.style.position = 'absolute';
         hoverModal.style.left = '0';
         hoverModal.style.zIndex = '10';
-        hoverModal.style.display = 'none';
         hoverModal.style.backgroundColor = 'transparent';
-        hoverModal.style.padding = '50px';
+        hoverModal.style.padding = '5px';
         hoverModal.style.width = '400px';
-        // translate up
-        hoverModal.style.transform = 'translateY(-50px)';
+        hoverModal.style.pointerEvents = 'none';
+        hoverModal.style.transform = 'translateY(-50%)';
+        hoverModal.style.marginLeft = '30px';
+        hoverModal.style.opacity = '0';
+        hoverModal.style.visibility = 'hidden';
+        hoverModal.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
 
         const iframe = document.createElement('iframe');
         iframe.src = `https://leetcard.jacoblin.cool/${friend}?width=500&height=250&animation=false&theme=dark&font=Noto%20Sans&ext=contest`;
         iframe.width = '400px';
         iframe.height = '250px';
         iframe.style.border = 'none';
-        iframe.style.transform = 'scale(0.9)';
         hoverModal.appendChild(iframe);
 
+        let hoverTimeout;
+
         a.addEventListener('mouseover', () => {
-          hoverModal.style.display = 'block';
+          clearTimeout(hoverTimeout);
+          hoverTimeout = setTimeout(() => {
+            hoverModal.style.opacity = '1';
+            hoverModal.style.visibility = 'visible';
+          }, 300);
         });
 
         a.addEventListener('mouseout', () => {
-          hoverModal.style.display = 'none';
+          clearTimeout(hoverTimeout);
+          hoverTimeout = setTimeout(() => {
+            hoverModal.style.opacity = '0';
+            hoverModal.style.visibility = 'hidden';
+          }, 300);
         });
 
-        li.appendChild(a); // Append the link with the friend's name
-        li.appendChild(hoverModal); // Append the hover modal
+        li.appendChild(a);
+        li.appendChild(hoverModal);
 
         const removeBtn = document.createElement("span");
         removeBtn.className = "remove-btn";
@@ -370,11 +390,10 @@ function updateFriendsList(searchTerm = "") {
           ? createSolvedProblemsTable(data.solvedData, data.ratings)
           : document.createTextNode("Could not fetch data.");
 
-        li.appendChild(a); // Append the link with the friend's name
-        li.appendChild(table); // Append the table with solved problem stats
-        li.appendChild(removeBtn); // Append the remove button
+        li.appendChild(table);
+        li.appendChild(removeBtn);
 
-        friendsList.appendChild(li); // Append the entire list item to the friends list
+        friendsList.appendChild(li);
       }
     });
 
