@@ -1,23 +1,6 @@
 const LC_API = 'https://leetcode.com/graphql'; 
 
 
-// Initialize the tabs
-document.querySelectorAll(".tab").forEach((tab) => {
-  tab.addEventListener("click", function () {
-    document
-      .querySelectorAll(".tab")
-      .forEach((t) => t.classList.remove("active"));
-    document
-      .querySelectorAll(".tab-content")
-      .forEach((tc) => tc.classList.remove("active"));
-
-    this.classList.add("active");
-    document
-      .getElementById(this.getAttribute("data-tab"))
-      .classList.add("active");
-  });
-});
-
 // to get solved problems
 async function getSolvedProblems(username) {
   const query = `
