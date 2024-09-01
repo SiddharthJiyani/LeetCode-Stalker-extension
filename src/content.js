@@ -34,20 +34,23 @@ async function injectFriendsList() {
         return;
     }
 
+    // fetch theme from html tag--> style : <html lang="en" class="sfhpwampe idc0_350 dark" style="color-scheme: dark;">
+    const theme = document.documentElement.className.includes('dark') ? 'dark' : 'light';
+
     const friendsListHTML = `
-        <div id="leetcode-friends-list" style="margin-top: 10px; padding: 10px; background-color: #2d2d2d; border-radius: 5px;">
-            <h3 style="font-size: 1em; font-weight: bold; color: #f5f5f5; margin-bottom: 8px; text-align: left;">Friends List</h3>
-            <ul style="list-style-type: none; padding-left: 0; margin: 0;">
-                ${friendsToShow.map(friend => 
-                    `<li style="margin-bottom: 5px;">
-                        <a target="_blank" href="https://leetcode.com/${friend}/" style="text-decoration: none; color: #9fa1a4;">${friend}</a>
-                    </li>`
-                ).join('')}
-            </ul>
-            <button id="showMore" style="display: ${friendsToShow.length < friendsList.length ? 'block' : 'none'}; width: 100%; margin-top: 10px; padding: 5px;">Show More</button>
-        </div>
-    `;
-    
+    <div id="leetcode-friends-list" style="margin-top: 10px; padding: 10px; background-color: ${theme === 'dark' ? '#2d2d2d' : '#f5f5f5'}; border-radius: 5px;">
+        <h3 style="font-size: 1em; font-weight: bold; color: ${theme === 'dark' ? '#f5f5f5' : '#000000'}; margin-bottom: 8px; text-align: left;">Friends List</h3>
+        <ul style="list-style-type: none; padding-left: 0; margin: 0;">
+            ${friendsToShow.map(friend => 
+                `<li style="margin-bottom: 5px;">
+                    <a target="_blank" href="https://leetcode.com/${friend}/" style="text-decoration: none; color: ${theme === 'dark' ? '#9fa1a4' : '#000000'};">${friend}</a>
+                </li>`
+            ).join('')}
+        </ul>
+        <button id="showMore" style="display: ${friendsToShow.length < friendsList.length ? 'block' : 'none'}; width: 100%; margin-top: 10px; padding: 5px;">Show More</button>
+    </div>
+`;
+            
     const profileContainer = document.querySelector('.border-divider-3');
     if (profileContainer) {
         const existingFriendsList = document.querySelector('#leetcode-friends-list');

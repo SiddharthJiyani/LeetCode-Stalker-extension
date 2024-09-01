@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "LC Stalker",
-    "version": "1.0",
+    "version": "1.0.1",
     "description": "Adds a friends list to LeetCode profile pages",
     "permissions": ["storage"],
     "host_permissions": ["https://leetcode.com/*"],
