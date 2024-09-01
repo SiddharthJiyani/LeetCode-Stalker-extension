@@ -149,6 +149,8 @@ function createSolvedProblemsTable(solvedData, ratings) {
 
   const ratingTd = trBody.lastChild;
   const topPercentage = ratings.topPercentage;
+  const rating = ratings.contestRating;
+  console.log('rating', rating);
   if (topPercentage <= 5) {
     ratingTd.style.color = "transparent";
     ratingTd.style.background = "linear-gradient(to right, #82d9bc, #0d9a41)"; 
@@ -163,6 +165,12 @@ function createSolvedProblemsTable(solvedData, ratings) {
     ratingTd.style.webkitBackgroundClip = "text";
     ratingTd.style.backgroundClip = "text"; 
     ratingTd.style.fontWeight = "bold";
+  }
+
+  if(rating == null){
+    ratingTd.style.color = 'white'
+    ratingTd.textContent = 'N/A';
+    ratingTd.style.fontWeight = "normal";
   }
 
 
