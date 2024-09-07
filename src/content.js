@@ -2,18 +2,37 @@ let friendsPerPage = 6;
 let currentPage = 1;
 let friendsList = [];
 
+// Check if a username exists by fetching their LeetCode page
 async function checkUserExists(username) {
     const response = await fetch(`https://leetcode.com/${username}/`);
     return response.status === 200;
 }
 
-async function injectFriendsList() {
-    if (friendsList.length === 0) {
-        friendsList = await new Promise(resolve => {
-            chrome.storage.sync.get(['friends'], result => resolve(result.friends || []));
-        });
+// Get the friends list from Chrome storage
+async function getFriendsList() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(['friends'], (result) => resolve(result.friends || []));
+    });
+}
 
-        friendsList = await Promise.all(friendsList.map(async friend => {
+// Add or remove a friend in Chrome storage
+async function updateFriendsList(newList) {
+    return new Promise((resolve) => {
+        chrome.storage.sync.set({ friends: newList }, () => resolve());
+    });
+}
+
+// Inject the friends list into the page
+async function injectFriendsList() {
+    // Load friends list if not already done
+    console.log('isOwnProfile', await isOwnProfile());
+    if (!(await isOwnProfile())) {
+        console.log('Not own profile');
+        return;
+    }
+    if (friendsList.length === 0) {
+        friendsList = await getFriendsList();
+        friendsList = await Promise.all(friendsList.map(async (friend) => {
             const exists = await checkUserExists(friend);
             return exists ? friend : null;
         }));
@@ -29,6 +48,7 @@ async function injectFriendsList() {
         return;
     }
 
+    // Styling and theme settings...
     const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
     const colors = {
         dark: {
@@ -76,7 +96,8 @@ async function injectFriendsList() {
     list.style.paddingLeft = '0';
     list.style.margin = '0';
 
-    friendsToShow.forEach(friend => {
+    // Display friends list...
+    friendsToShow.forEach((friend) => {
         const listItem = document.createElement('li');
         listItem.style.position = 'relative';
         listItem.style.marginBottom = '5px';
@@ -106,7 +127,7 @@ async function injectFriendsList() {
 
         const iframe = document.createElement('iframe');
         iframe.src = `https://leetcard.jacoblin.cool/${friend}?width=500&height=200&animation=false&theme=${theme === 'dark' ? 'dark' : 'light'}&font=Noto%20Sans&ext=contest`;
-        iframe.width ='auto';
+        iframe.width = 'auto';
         iframe.height = '240px';
         iframe.style.border = 'none';
         hoverModal.appendChild(iframe);
@@ -136,6 +157,7 @@ async function injectFriendsList() {
 
     friendsListContainer.appendChild(list);
 
+    // "Show More" Button
     if (friendsToShow.length < friendsList.length) {
         const showMoreButton = document.createElement('button');
         showMoreButton.id = 'showMore';
@@ -168,8 +190,73 @@ async function injectFriendsList() {
     }
 }
 
+// Function to inject "Add Friend" or "Remove Friend" button
+async function injectAddRemoveFriendButton() {
+    const currentUsername = getUsernameFromURL();
+    if (!currentUsername || (await isOwnProfile())) return;
+
+    const friends = await getFriendsList();
+    const isFriend = friends.includes(currentUsername);
+    const button = document.createElement('button');
+    button.textContent = isFriend ? 'Remove Friend' : 'Add Friend';
+    button.className = 'w-full rounded-lg py-[7px] text-center font-medium';
+    button.style.transition = 'background-color 0.15s, color 0.15s';
+    button.style.marginTop = '10px';
+    button.style.cursor = 'pointer';
+
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    if (isFriend) {
+        button.style.backgroundColor = '#ff253a1f';
+        button.style.color = isDarkMode ? '#ff253a' : '#dc3545';
+    } else {
+        button.style.backgroundColor = '#2cbb5d1f';
+        button.style.color = isDarkMode ? 'rgb(44 187 93)' : '#2cbb5d';
+    }
+
+    button.addEventListener('mouseover', () => {
+        if (isFriend) {
+            button.style.backgroundColor = isDarkMode ? '#ff253a33' : '#ff253a26';
+        } else {
+            button.style.backgroundColor = isDarkMode ? '#3da76a33' : '#2cbb5d33';
+        }
+    });
+
+    button.addEventListener('mouseout', () => {
+        if (isFriend) {
+            button.style.backgroundColor = '#ff253a1f';
+        } else {
+            button.style.backgroundColor = '#2cbb5d1f';
+        }
+    });
+
+
+    button.addEventListener('click', async () => {
+        let updatedFriends;
+        if (isFriend) {
+            updatedFriends = friends.filter((friend) => friend !== currentUsername);
+        } else {
+            updatedFriends = [...friends, currentUsername];
+        }
+        await updateFriendsList(updatedFriends);
+        injectAddRemoveFriendButton(); // Refresh button after update
+    });
+
+    const profileContainer = document.querySelector('.border-divider-3');
+    if (profileContainer) {
+        const existingButton = document.querySelector('#addRemoveFriendButton');
+        if (existingButton) {
+            existingButton.remove();
+        }
+        button.id = 'addRemoveFriendButton';
+        profileContainer.insertAdjacentElement('beforebegin', button);
+    }
+}
+
 function handleThemeChange() {
-    const observer = new MutationObserver(() => injectFriendsList());
+    const observer = new MutationObserver(() => {
+        injectFriendsList();
+        injectAddRemoveFriendButton();
+    });
     observer.observe(document.documentElement, {
         attributes: true,
         attributeFilter: ['class']
@@ -191,9 +278,14 @@ function isOwnProfile() {
     });
 }
 
-isOwnProfile().then(isOwn => {
+// Check if it's your own profile or someone else's
+isOwnProfile().then((isOwn) => {
     if (isOwn) {
         setTimeout(injectFriendsList, 1000);
         handleThemeChange(); // Monitor and handle theme changes
+    } else {
+        setTimeout(injectAddRemoveFriendButton, 1000); // Add "Add/Remove Friend" button on someone else's profile
     }
 });
+
+

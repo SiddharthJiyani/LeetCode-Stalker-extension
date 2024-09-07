@@ -191,6 +191,20 @@ document.getElementById("saveUsername").addEventListener("click", () => {
   }
 });
 
+// on hitting enter key in username input field save username
+document.getElementById("username").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    if (username) {
+      chrome.storage.sync.set({ ownUsername: username }, () => {
+        alert("Your username has been saved.");
+        window.location.reload();
+      });
+    }
+  }
+});
+
 async function checkUserExists(username) {
   const response = await fetch(`https://leetcode.com/${username}/`);
   return response.status === 200;
