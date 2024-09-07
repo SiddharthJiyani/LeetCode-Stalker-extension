@@ -84,6 +84,20 @@
       }
       #addFriend {
         margin-bottom: 10px;
+        width: 30%;
+        /* height: 25px; */
+        margin: 10px;
+      }
+      .add-friend{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+      #friendUsername{
+        margin-bottom: 0px;
+        height: 18px;
       }
       #showMore {
         display: none;
@@ -206,6 +220,8 @@
         border-color: #ffa116;
       }
 
+
+
     </style>
   </head>
   <div>
@@ -237,8 +253,10 @@
       <br /><br />
 
       <!-- Add Friend Section -->
-      <input type="text" id="friendUsername" placeholder="Friend's username" />
-      <button id="addFriend">Add Friend</button>
+      <div class="add-friend">
+        <input type="text" id="friendUsername" placeholder="Friend's username" />
+        <button id="addFriend">Add</button>
+      </div>
 
       <!-- Search Btn -->
       <div class="search">
