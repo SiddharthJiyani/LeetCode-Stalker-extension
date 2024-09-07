@@ -181,6 +181,31 @@
           100% { transform: rotate(360deg); }
       }
 
+      .sort-dropdown {
+        width: 140px;
+        padding: 5px;
+        margin-top: 9px;
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 3px;
+        font-size: 0.8em;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 5px center;
+        background-size: 16px auto;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+      }
+
+      .sort-dropdown:focus {
+        outline: none;
+        border-color: #ffa116;
+      }
+
     </style>
   </head>
   <div>
@@ -226,6 +251,13 @@
         </button>
       </div>
 
+      <!-- Sort Dropdown -->
+      <select id="sortDropdown" class="sort-dropdown">
+        <option value="alphabetical">Sort Alphabetically</option>
+        <option value="rating">Sort by Rating</option>
+        <option value="solved">Sort by Solved Problems</option>
+      </select>
+      
       <!-- Friends List -->
       <ul id="friendsList"></ul>
       <div id="loadingSpinner"></div>

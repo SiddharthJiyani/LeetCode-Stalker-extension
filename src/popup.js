@@ -186,6 +186,7 @@ document.getElementById("saveUsername").addEventListener("click", () => {
   if (username) {
     chrome.storage.sync.set({ ownUsername: username }, () => {
       alert("Your username has been saved.");
+      window.location.reload();
     });
   }
 });
@@ -297,8 +298,23 @@ function hideLoadingSpinner() {
   document.getElementById("loadingSpinner").style.display = "none";
 }
 
+function sortFriendsData(friendsData, sortBy) {
+  return friendsData.sort((a, b) => {
+    if (sortBy === 'alphabetical') {
+      return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+    } else if (sortBy === 'rating') {
+      return (b.ratings.contestRating || 0) - (a.ratings.contestRating || 0);
+    } else if (sortBy === 'solved') {
+      const aTotalSolved = a.solvedData.easySolved + a.solvedData.mediumSolved + a.solvedData.hardSolved;
+      const bTotalSolved = b.solvedData.easySolved + b.solvedData.mediumSolved + b.solvedData.hardSolved;
+      return bTotalSolved - aTotalSolved;
+    }
+    return 0;
+  });
+}
 
-function updateFriendsList(searchTerm = "") {
+
+function updateFriendsList(searchTerm = "", sortBy = "alphabetical") {
   const friendsList = document.getElementById("friendsList");
   friendsList.innerHTML = ""; // Clear the existing list
 
@@ -307,7 +323,6 @@ function updateFriendsList(searchTerm = "") {
 
   chrome.storage.sync.get(["friends"], async (result) => {
     let friends = result.friends || [];
-    friends.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
     if (searchTerm) {
       searchTerm = searchTerm.toLowerCase();
@@ -316,12 +331,16 @@ function updateFriendsList(searchTerm = "") {
       );
     }
 
-    const fetchPromises = friends.map(fetchFriendData);
-    const friendsData = await Promise.all(fetchPromises);
+    const fetchPromises = friends.map(friend => fetchFriendData(friend).then(data => ({ ...data, username: friend })));
+    let friendsData = await Promise.all(fetchPromises);
 
-    friendsData.forEach((data, index) => {
+    // Sort the friendsData array based on the chosen sortBy criteria
+    friendsData = sortFriendsData(friendsData.filter(Boolean), sortBy);
+
+    // Now render each friend’s data
+    friendsData.forEach((data) => {
       if (data) {
-        const friend = friends[index];
+        const friend = data.username; // Use the username from data
         const li = document.createElement("li");
         li.className = "friend-item";
         li.style.position = "relative";
@@ -410,8 +429,25 @@ function updateFriendsList(searchTerm = "") {
   });
 }
 
+
+// Add this event listener for the sort dropdown
+document.getElementById("sortDropdown").addEventListener("change", (event) => {
+  const sortBy = event.target.value;
+  const searchTerm = document.getElementById("searchFriends").value;
+  updateFriendsList(searchTerm, sortBy);
+});
+
+document.getElementById("searchFriends").addEventListener("keydown", debounce((event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const searchTerm = document.getElementById("searchFriends").value;
+    const sortBy = document.getElementById("sortDropdown").value;
+    updateFriendsList(searchTerm, sortBy);
+  }
+}, 300));
+
 // Initialize friends list on page load
 document.addEventListener('DOMContentLoaded', () => {
   hideLoadingSpinner(); // Make sure the spinner is hidden on page load.
-  updateFriendsList();
+  updateFriendsList("", "alphabetical");
 });
