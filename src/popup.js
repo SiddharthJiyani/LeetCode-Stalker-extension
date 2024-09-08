@@ -360,7 +360,7 @@ function updateFriendsList(searchTerm = "", sortBy = "alphabetical") {
         li.style.position = "relative";
 
         const a = document.createElement("a");
-        a.href = `https://leetcode.com/${friend}/`;
+        a.href = `https://leetcode.com/u/${friend}/`;
         a.textContent = friend;
         a.target = "_blank";
         a.style.marginRight = "10px";
